@@ -7,9 +7,11 @@ import java.util.List;
 
 public interface UserService {
 
-    boolean registerTeacher(TeacherRegisterRequest requestDTO);
+    ResponseAuth registerTeacher(TeacherRegisterRequest requestDTO);
 
-    boolean registerStudent(StudentRegisterRequest requestDTO);
+    ResponseAuth registerStudent(StudentRegisterRequest requestDTO);
+
+    String login(LoginRequest requestDTO);
 
     void changeState(StatusDTO dto);
 

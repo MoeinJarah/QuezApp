@@ -1,72 +1,98 @@
 package ir.mrmoein.quezapplication.controller;
 
 
-import ir.mrmoein.quezapplication.controller.admin.AdminController;
+import ir.mrmoein.quezapplication.model.dto.LoginRequest;
+import ir.mrmoein.quezapplication.model.dto.ResponseAuth;
 import ir.mrmoein.quezapplication.model.dto.StudentRegisterRequest;
 import ir.mrmoein.quezapplication.model.dto.TeacherRegisterRequest;
 import ir.mrmoein.quezapplication.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.ModelAndView;
 
-@Controller
+import javax.naming.AuthenticationException;
+import java.io.IOException;
+
+@RestController
 @RequestMapping("/start")
 public class UserController {
 
     private final UserService service;
+    private final UserService userService;
 
     @Autowired
-    public UserController(UserService service) {
+    public UserController(UserService service, UserService userService) {
         this.service = service;
+        this.userService = userService;
     }
 
-    @GetMapping
-    public String showLoginForm() {
-        return "login";
+    @GetMapping("/login")
+    public ModelAndView showLoginForm() {
+        return new ModelAndView("login");
     }
 
     @GetMapping("/signup")
-    public String signup() {
-        return "role_selection";
+    public ModelAndView signup() {
+        return new ModelAndView("role_selection");
     }
 
     @GetMapping("/teacher-signup")
-    public String teacher() {
-        return "signup_teacher";
+    public ModelAndView teacher() {
+        return new ModelAndView("signup_teacher");
     }
 
     @GetMapping("/student-signup")
-    public String student() {
-        return "signup_student";
+    public ModelAndView student() {
+        return new ModelAndView("signup_student");
     }
 
-    @PostMapping(value = "/student", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String student(@ModelAttribute StudentRegisterRequest registerRequest , Model model) {
-        if (service.registerStudent(registerRequest)) {
-            model.addAttribute("info" , true);
-            return "redirect:/login";
-        } else {
-            model.addAttribute("error" , true);
-            return "signup_student";
-        }
+    //this methods for Basic Auth
+//    @PostMapping(value = "/student", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public String student(@ModelAttribute StudentRegisterRequest registerRequest , Model model) {
+//        if (service.registerStudent(registerRequest)) {
+//            model.addAttribute("info" , true);
+//            return "redirect:/login";
+//        } else {
+//            model.addAttribute("error" , true);
+//            return "signup_student";
+//        }
+//    }
+//
+//    @PostMapping(value = "/teacher", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public String teacher(@ModelAttribute TeacherRegisterRequest registerRequest , RedirectAttributes redirectAttributes) {
+//        if (service.registerTeacher(registerRequest)) {
+//            redirectAttributes.addAttribute("info" , true);
+//            return "redirect:/login";
+//        } else {
+//            redirectAttributes.addAttribute("error" , true);
+//            return "redirect:/signup";
+//        }
+//    }
+
+    //this methods for jwtAuth
+    @PostMapping(value = "/student" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseAuth> registerStudent(@ModelAttribute StudentRegisterRequest studentRegisterRequest){
+        ResponseAuth responseAuth = service.registerStudent(studentRegisterRequest);
+        return ResponseEntity.ok(responseAuth);
     }
 
-    @PostMapping(value = "/teacher", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String teacher(@ModelAttribute TeacherRegisterRequest registerRequest , RedirectAttributes redirectAttributes) {
-        if (service.registerTeacher(registerRequest)) {
-            redirectAttributes.addAttribute("info" , true);
-            return "redirect:/login";
-        } else {
-            redirectAttributes.addAttribute("error" , true);
-            return "redirect:/signup";
-        }
+    @PostMapping(value = "/teacher" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseAuth> registerTeacher(@ModelAttribute TeacherRegisterRequest teacherRegisterRequest){
+        ResponseAuth responseAuth = service.registerTeacher(teacherRegisterRequest);
+        return ResponseEntity.ok(responseAuth);
+    }
+
+    @PostMapping(value = "/login" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> login(@Valid @ModelAttribute LoginRequest loginRequest){
+        String login = userService.login(loginRequest);
+        return ResponseEntity.ok(login);
     }
 
 }

@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    volumes:
+      - ./target/quezapp.jar:/app/quezapp.jar
+    command: ["java" , "-jar" , "/app/quezapp.jar"]
+
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/quezapp
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: moein1379
+      SPRING_ELASTICSEARCH_URIS: http://elastic:9200

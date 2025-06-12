@@ -1,5 +1,6 @@
 package ir.mrmoein.quezapplication.model.entity;
 
+import jakarta.persistence.GenerationType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

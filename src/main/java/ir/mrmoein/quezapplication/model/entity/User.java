@@ -1,8 +1,6 @@
 package ir.mrmoein.quezapplication.model.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import jakarta.persistence.*;
@@ -13,8 +11,10 @@ import java.util.*;
 @Entity
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(of = {"username"}, callSuper = false)
 @Table(name = "UserApp")
 public class User extends BaseEntity<UUID>{
 
@@ -35,5 +35,10 @@ public class User extends BaseEntity<UUID>{
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    @PrePersist
+    private void prePersist() {
+        this.enable = Boolean.FALSE;
+    }
 
 }

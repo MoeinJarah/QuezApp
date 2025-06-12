@@ -1,6 +1,6 @@
 server:
   max-http-request-header-size: 64KB
-  port: 8081
+  port: 8080
 spring:
   servlet:
     multipart:
@@ -9,9 +9,9 @@ spring:
       enabled: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/quizapp
-    username: postgres
-    password: moein1379
+    url: jdbc:postgresql://db:5432/quizapp
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -19,8 +19,10 @@ spring:
     show-sql: true
 
   elasticsearch:
-    uris: http://localhost:9200
+    uris: http://elastic:9200
 
+  secret_key :
+    "secret_key"
 
   data:
     elasticsearch:

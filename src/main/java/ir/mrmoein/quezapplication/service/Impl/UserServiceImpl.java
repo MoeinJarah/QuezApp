@@ -12,12 +12,17 @@ import ir.mrmoein.quezapplication.model.entity.*;
 import ir.mrmoein.quezapplication.repository.elastic.SearchStudent;
 import ir.mrmoein.quezapplication.repository.elastic.SearchTeacher;
 import ir.mrmoein.quezapplication.repository.jpa.*;
+import ir.mrmoein.quezapplication.security.jwt.JwtService;
 import ir.mrmoein.quezapplication.service.UserService;
 import ir.mrmoein.quezapplication.util.DTOService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,12 +40,15 @@ public class UserServiceImpl implements UserService {
     private final SearchTeacher searchTeacher;
     private final SearchStudent searchStudent;
     private final RoleRepository roleRepository;
+    private final AuthenticationManager authenticationManager;
     private final DTOService dtoService;
     private final OutBoxRepository outBoxRepository;
+    private final JwtService jwtService;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder bCrypt, TeacherRepository teaccherRepository,
-                           StudentRepository studentRepository, SearchTeacher searchTeacher, SearchStudent searchStudent, RoleRepository roleRepository, DTOService dtoService, OutBoxRepository outBoxRepository) {
+                           StudentRepository studentRepository, SearchTeacher searchTeacher, SearchStudent searchStudent, RoleRepository roleRepository, AuthenticationManager authenticationManager, DTOService dtoService, OutBoxRepository outBoxRepository, JwtService jwtService, RefreshTokenRepository refreshTokenRepository) {
         this.userRepository = userRepository;
         this.bCrypt = bCrypt;
         this.teacherRepository = teaccherRepository;
@@ -48,13 +56,16 @@ public class UserServiceImpl implements UserService {
         this.searchTeacher = searchTeacher;
         this.searchStudent = searchStudent;
         this.roleRepository = roleRepository;
+        this.authenticationManager = authenticationManager;
         this.dtoService = dtoService;
         this.outBoxRepository = outBoxRepository;
+        this.jwtService = jwtService;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public boolean registerTeacher(TeacherRegisterRequest requestDTO) {
+    public ResponseAuth registerTeacher(TeacherRegisterRequest requestDTO) {
         try {
             Optional<TeacherDoc> teacher1 = searchTeacher.findByNationalCode(requestDTO.getNationalCode());
             if (teacher1.isEmpty()) {
@@ -77,10 +88,9 @@ public class UserServiceImpl implements UserService {
                         .build();
 
                 outBoxRepository.save(outBox);
-
-                return true;
+                return new ResponseAuth("Teacher successfully registered.", Boolean.TRUE);
             } else {
-                throw new DataIntegrityViolationException("this user is already exist !!!");
+                throw new RuntimeException("this user is already exist !!!");
             }
         } catch (Exception e) {
             throw new RegisterFailedException("please again signup !!! " + e.getMessage());
@@ -89,7 +99,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public boolean registerStudent(StudentRegisterRequest requestDTO) {
+    public ResponseAuth registerStudent(StudentRegisterRequest requestDTO) {
         try {
             Optional<StudentDoc> student1 = searchStudent.findByNationalCode(requestDTO.getNationalCode());
             if (student1.isEmpty()) {
@@ -97,7 +107,6 @@ public class UserServiceImpl implements UserService {
                 User user = student.getUserId();
                 user.setPassword(bCrypt.encode(user.getPassword()));
                 user.setRoles(getRole(RoleName.ROLE_STUDENT));
-                user.setEnable(Boolean.FALSE);
                 User save = userRepository.save(user);
                 student.setUserId(save);
                 Student entity = studentRepository.save(student);
@@ -109,15 +118,35 @@ public class UserServiceImpl implements UserService {
                         .nationalCode(entity.getNationalCode())
                         .generalDate(entity.getCreateDate())
                         .build();
-
                 outBoxRepository.save(outBox);
-                return true;
+                return new ResponseAuth("student successfully registered.", Boolean.TRUE);
             } else {
-                return false;
+                throw new RuntimeException("this user is already exist !!!");
             }
         } catch (Exception e) {
             throw new NotAccessException("please again signup !!!");
         }
+    }
+
+    @Override
+    public String login(LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
+        );
+
+        UserDetails user = (UserDetails) authentication.getPrincipal();
+        Optional<JwtRefreshToken> refreshToken = refreshTokenRepository.findByUsername(user.getUsername());
+
+        if (refreshToken.isEmpty() || refreshToken.get().getRevoked()) {
+            JwtRefreshToken jwtRefreshToken = JwtRefreshToken.builder()
+                    .username(user.getUsername())
+                    .build();
+            refreshTokenRepository.save(jwtRefreshToken);
+        }
+        return jwtService.generateAccessToken(user);
     }
 
     @Override

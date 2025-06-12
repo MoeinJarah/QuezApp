@@ -19,24 +19,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository repository;
-    private final SearchTeacher teacherRepo;
-    private final SearchStudent studentRepo;
+
     private final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
-
-
     @Autowired
-    public CustomUserDetailsService(UserRepository repository, SearchTeacher teacherRepo, SearchStudent studentRepo) {
+    public CustomUserDetailsService(UserRepository repository) {
         this.repository = repository;
-        this.teacherRepo = teacherRepo;
-        this.studentRepo = studentRepo;
     }
 
     @Override
@@ -60,12 +53,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             logger.info("User {} you want to log in but you haven't activated the account yet" , user.getUsername());
             throw new NotEnableUserException("this account not enable !!!");
         }
-
     }
 
-    private Set<? extends GrantedAuthority> mapRolesToAuthorities(Set<Role> roles) {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toSet());
-    }
 }

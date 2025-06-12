@@ -1,4 +1,4 @@
-package ir.mrmoein.quezapplication.service.Impl;
+package ir.mrmoein.quezapplication.scheduling;
 
 import ir.mrmoein.quezapplication.controller.admin.AdminController;
 import ir.mrmoein.quezapplication.model.entity.*;
@@ -6,31 +6,34 @@ import ir.mrmoein.quezapplication.repository.elastic.SearchStudent;
 import ir.mrmoein.quezapplication.repository.elastic.SearchTeacher;
 import ir.mrmoein.quezapplication.repository.jpa.ExamRepository;
 import ir.mrmoein.quezapplication.repository.jpa.OutBoxRepository;
-import ir.mrmoein.quezapplication.service.OutBoxService;
+import ir.mrmoein.quezapplication.repository.jpa.RefreshTokenRepository;
+import ir.mrmoein.quezapplication.service.ScheduledTasks;
 import ir.mrmoein.quezapplication.util.DTOService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Service
-public class OutBoxServiceImpl implements OutBoxService {
+@Component
+public class ScheduledTasksImpl implements ScheduledTasks {
 
     private final OutBoxRepository repository;
     private final SearchTeacher searchTeacher;
     private final SearchStudent searchStudent;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final DTOService dtoService;
     private final Logger logger = LoggerFactory.getLogger(AdminController.class);
     private final ExamRepository examRepository;
 
-    public OutBoxServiceImpl(OutBoxRepository repository, SearchTeacher searchTeacher, SearchStudent searchStudent, DTOService dtoService, ExamRepository examRepository) {
+    public ScheduledTasksImpl(OutBoxRepository repository, SearchTeacher searchTeacher, SearchStudent searchStudent, RefreshTokenRepository refreshTokenRepository, DTOService dtoService, ExamRepository examRepository) {
         this.repository = repository;
         this.searchTeacher = searchTeacher;
         this.searchStudent = searchStudent;
+        this.refreshTokenRepository = refreshTokenRepository;
         this.dtoService = dtoService;
         this.examRepository = examRepository;
     }
@@ -71,5 +74,15 @@ public class OutBoxServiceImpl implements OutBoxService {
             examRepository.save(exam);
         });
         logger.info("check expire exam. ");
+    }
+
+    @Override
+    @Scheduled(fixedRate = 1000 * 60 * 60 * 24)
+    @Transactional(rollbackOn = Exception.class)
+    public void checkExpireRefreshToken() {
+        List<JwtRefreshToken> allByRevoked = refreshTokenRepository.findAllByRevoked(true);
+        if (!allByRevoked.isEmpty()){
+            refreshTokenRepository.deleteAll(allByRevoked);
+        }
     }
 }
