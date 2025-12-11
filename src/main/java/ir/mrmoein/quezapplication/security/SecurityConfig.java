@@ -1,6 +1,5 @@
 package ir.mrmoein.quezapplication.security;
 
-import ir.mrmoein.quezapplication.security.jwt.AuthEntryPointJwt;
 import ir.mrmoein.quezapplication.service.Impl.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,24 +19,29 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final AuthEntryPointJwt authenticationEntryPoint;
+//    private final AuthEntryPointJwt authenticationEntryPoint;
     private final CustomUserDetailsService details;
 
-    public SecurityConfig(AuthEntryPointJwt authenticationEntryPoint, CustomUserDetailsService userDetailsService) {
-        this.authenticationEntryPoint = authenticationEntryPoint;
-        this.details = userDetailsService;
+    public SecurityConfig(CustomUserDetailsService details) {
+        this.details = details;
     }
+
+//    public SecurityConfig(AuthEntryPointJwt authenticationEntryPoint, CustomUserDetailsService userDetailsService) {
+//        this.authenticationEntryPoint = authenticationEntryPoint;
+//        this.details = userDetailsService;
+//    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception -> {
-                    exception.authenticationEntryPoint(authenticationEntryPoint);
-                })
-                .sessionManagement(sessionManagement -> {
-                    sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-                })
+//                .exceptionHandling(exception -> {
+//                    exception.authenticationEntryPoint(authenticationEntryPoint);
+//                })
+//                .sessionManagement(sessionManagement -> {
+//                    sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//                })
                 .authorizeHttpRequests(authorizeRequests -> {
                     authorizeRequests
                             .requestMatchers("/", "/login" , "/error" , "/start/**", "/index", "/welcome/**").permitAll()

@@ -1,9 +1,14 @@
+# Base image با JDK 17
 FROM eclipse-temurin:17-jdk-alpine
 
-WORKDIR /quezApp
+# مسیر کاری در کانتینر
+WORKDIR /app
 
-COPY target/quezApplication-0.0.1-SNAPSHOT.jar quezApp.jar
+# Copy فایل JAR به داخل کانتینر
+COPY target/quezApplication-0.0.1-SNAPSHOT.jar quezapp.jar
 
+# پورت اپلیکیشن
 EXPOSE 8080
 
-ENTRYPOINT ["java" , "-jar" , "quezApp.jar"]
+# دستور اجرای برنامه
+ENTRYPOINT ["java", "-jar", "quezapp.jar"]
