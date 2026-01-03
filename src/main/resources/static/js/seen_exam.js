@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const response = await fetch("/teacher/exam/test_correction", {
             method: "POST",
             headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token"),
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(studentData)
@@ -76,6 +77,7 @@ document.getElementById("grading-form").addEventListener("submit", function (e) 
     fetch("/teacher/exam/submit_correction", {
         method: "POST",
         headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token"),
             "Content-Type": "application/json"
         },
         body: JSON.stringify(result)

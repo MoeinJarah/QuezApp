@@ -19,6 +19,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.naming.AuthenticationException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/start")
@@ -89,10 +91,10 @@ public class UserController {
         return ResponseEntity.ok(responseAuth);
     }
 
-    @PostMapping(value = "/login" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> login(@Valid @ModelAttribute LoginRequest loginRequest){
-        String login = userService.login(loginRequest);
-        return ResponseEntity.ok(login);
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<Map<String, String>> login(@Valid @ModelAttribute LoginRequest loginRequest) {
+        return ResponseEntity.ok(userService.login(loginRequest));
     }
+
 
 }

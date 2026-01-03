@@ -34,7 +34,9 @@ function toggleEdit(id) {
 
         fetch(`/teacher/exam/update/${id}`, {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
             body: JSON.stringify(updatedExam)
         })
             .then(response => {
@@ -80,6 +82,9 @@ document.getElementById("createExamForm").addEventListener("submit", async funct
     form.append("course" , course)
 
     await fetch("/teacher/exam/create", {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
         method: "POST",
         body: form
     }).then(response => {
@@ -163,7 +168,10 @@ async function deleteExam(id) {
 
     await fetch(`/teacher/exam?id=${encodeURIComponent(id)}`, {
         method: "DELETE",
-        headers: {"Content-Type": "application/json"}
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token"),
+            "Content-Type": "application/json"
+        }
     }).then(response => {
         if (!response.ok) {
             throw new Error("مشکلی در حذف پیش آمده !!!")
@@ -217,7 +225,11 @@ async function showStudents(id) {
 
 async function showExamQuestions(id) {
     try {
-        let response = await fetch(`/teacher/exam/question?id=${id}`);
+        let response = await fetch(`/teacher/exam/question?id=${id}` , {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            }
+        });
         if (!response.ok) {
             throw new Error("مشکلی در این درخواست وجود دارد!!!");
         }

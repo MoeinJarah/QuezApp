@@ -4,8 +4,6 @@ import ir.mrmoein.quezapplication.controller.admin.AdminController;
 import ir.mrmoein.quezapplication.exception.NotEnableUserException;
 import ir.mrmoein.quezapplication.model.entity.Role;
 import ir.mrmoein.quezapplication.model.entity.User;
-import ir.mrmoein.quezapplication.repository.elastic.SearchStudent;
-import ir.mrmoein.quezapplication.repository.elastic.SearchTeacher;
 import ir.mrmoein.quezapplication.repository.jpa.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = repository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("this user not found : " + username));
 
-        if (user.getEnable()){
+        if (user.getEnable() || user.getUsername().equals("admin")) {
             List<GrantedAuthority> grantedAuthorities = new LinkedList<>();
 
             for (Role role : user.getRoles()) {

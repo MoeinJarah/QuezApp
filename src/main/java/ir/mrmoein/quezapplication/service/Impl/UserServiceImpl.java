@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(LoginRequest loginRequest) {
+    public Map<String , String> login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
@@ -140,13 +140,19 @@ public class UserServiceImpl implements UserService {
         UserDetails user = (UserDetails) authentication.getPrincipal();
         Optional<JwtRefreshToken> refreshToken = refreshTokenRepository.findByUsername(user.getUsername());
 
+        Optional<User> myUser = userRepository.findByUsername(user.getUsername());
+
         if (refreshToken.isEmpty() || refreshToken.get().getRevoked()) {
             JwtRefreshToken jwtRefreshToken = JwtRefreshToken.builder()
                     .username(user.getUsername())
                     .build();
             refreshTokenRepository.save(jwtRefreshToken);
         }
-        return jwtService.generateAccessToken(user);
+        String token = jwtService.generateAccessToken(user);
+        HashMap<String, String> result = new HashMap<>();
+        result.put("token", token);
+        result.put("role" , myUser.get().getRoles().stream().findFirst().get().getName());
+        return result;
     }
 
     @Override

@@ -2,7 +2,12 @@ let course_name = "";
 
 async function profileShow() {
     try {
-        let response = await fetch("/teacher/show", {method: "GET"});
+        let response = await fetch("/teacher/show", {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            method: "GET"
+        });
         if (!response.ok) throw new Error("خطا در دریافت اطلاعات پروفایل!");
         let teacherData = await response.json();
         localStorage.setItem("teacher", JSON.stringify(teacherData));
@@ -23,6 +28,9 @@ function showClassDetails(element) {
 async function showStudents() {
     try {
         const response = await fetch(`/teacher/students?course=${encodeURIComponent(course_name)}`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
             method: "GET"
         });
 
@@ -43,6 +51,9 @@ async function showStudents() {
 
 async function showExams() {
     await fetch("/teacher/exam" , {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
         method:"GET"
     }).then(response => {
         if (!response.ok){

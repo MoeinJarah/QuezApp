@@ -44,6 +44,9 @@ async function saveProfile() {
     }
 
     await fetch("/teacher/update", {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
         method: "PUT",
         body: form
     }).then(response => {

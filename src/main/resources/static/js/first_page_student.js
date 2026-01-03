@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", async function () {
     console.log("starting fetch")
     await fetch("/student/details", {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
         method: "GET"
     }).then(response => {
         if (!response.ok) {

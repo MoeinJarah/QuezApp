@@ -4,6 +4,7 @@ package ir.mrmoein.quezapplication.service;
 import ir.mrmoein.quezapplication.model.dto.*;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
 
@@ -11,7 +12,7 @@ public interface UserService {
 
     ResponseAuth registerStudent(StudentRegisterRequest requestDTO);
 
-    String login(LoginRequest requestDTO);
+    Map<String , String> login(LoginRequest requestDTO);
 
     void changeState(StatusDTO dto);
 

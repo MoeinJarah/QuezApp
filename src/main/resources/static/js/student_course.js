@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.log("starting fetch")
     let id = JSON.parse(localStorage.getItem("course"))
     await fetch(`/student/course?id=${encodeURIComponent(id)}`, {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
         method: "GET"
     }).then(response => {
         if (!response.ok) {

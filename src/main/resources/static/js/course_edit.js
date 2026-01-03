@@ -43,7 +43,12 @@ document.getElementById("students").addEventListener("click", function () {
 });
 
 function fetchResults(query) {
-    fetch(`/admin/course/selected?query=${query}`, {method: "GET"})
+    fetch(`/admin/course/selected?query=${query}`, {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
+        method: "GET"
+    })
         .then(response => {
             if (!response.ok) {
                 throw new Error("خطا در دریافت اطلاعات");
@@ -148,6 +153,9 @@ document.getElementById("form").addEventListener("submit", (event) => {
     }
 
     fetch("/admin/course/update", {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
         method: "PUT",
         body: formData
     })
@@ -175,6 +183,9 @@ document.getElementById("delete").addEventListener("click" , () => {
     if (!confirmDelete) return;
 
     fetch(`/admin/course/remove?name=${encodeURIComponent(name)}` , {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
         method : "DELETE"
     }).then((response) => {
         if (response.ok){

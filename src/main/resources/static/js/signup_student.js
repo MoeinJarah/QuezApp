@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 handleValidationErrors(errorData);
             }
 
-            window.location.href = "/start";
+            window.location.assign("/start/login");
 
         } catch (error) {
             console.error("خطا در ارسال درخواست:", error);

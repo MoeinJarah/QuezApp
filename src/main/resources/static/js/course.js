@@ -22,6 +22,9 @@ document.getElementById("course-form").addEventListener("submit", async function
     try {
         let response = await fetch(`/admin/course`, {
             method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
             body: formData
         });
 
@@ -45,6 +48,9 @@ document.querySelectorAll(".card_select").forEach(card => {
         let name_course = card.querySelector(".card-title").innerText
         let response = await fetch(`/admin/course/edit?courseName=${encodeURIComponent(name_course)}`, {
             method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            }
         })
         if (!response.ok) throw Error("field fetch course edit !!!");
         let courseData = await response.json();

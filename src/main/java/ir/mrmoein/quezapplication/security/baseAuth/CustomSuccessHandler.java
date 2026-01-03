@@ -27,7 +27,7 @@
 //    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 //        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 //
-//        String def = "/home";
+//        String def = "/start";
 //
 //        label:
 //        for (GrantedAuthority authority : authorities) {

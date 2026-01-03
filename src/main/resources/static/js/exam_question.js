@@ -21,7 +21,10 @@ async function filterResults() {
     let query = document.getElementById("searchInput").value;
 
     let response = await fetch(`/teacher/exam/search?value=${encodeURIComponent(query)}`, {
-        method: "GET",
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
+        method: "GET"
     });
 
     if (!response.ok) throw new Error("Failed request !!!");
@@ -61,6 +64,9 @@ async function selectQuestion(id, course) {
     console.log(JSON.stringify(course))
 
     await fetch(`/teacher/exam/selected?id=${encodeURIComponent(id)}&exam=${encodeURIComponent(exam)}`, {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
         method: "POST"
     }).then(response => {
         if (!response.ok) {
@@ -125,6 +131,9 @@ async function createQuestion(event, question) {
 
     try {
         let response = await fetch("/teacher/exam/generate", {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
             method: "POST",
             body: form
         });
@@ -187,6 +196,9 @@ function loadQuestions() {
 async function updateScore(id , exam) {
     let value = document.getElementById(`score-${id}`).value
     await fetch(`/teacher/exam/update?exam=${exam}&id=${id}&value=${value}` , {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
         method : "PUT"
     }).then(resp => {
         if (!resp.ok) {
@@ -233,6 +245,9 @@ async function deleteQuestion(id) {
     }
     try {
         let response = await fetch(`/teacher/exam/remove?id=${id}&exam=${exam}`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
             method: "DELETE"
         });
 

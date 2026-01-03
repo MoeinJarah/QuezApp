@@ -10,6 +10,9 @@ document.querySelectorAll(".convert").forEach(button => {
         form.append("roleName", button.getAttribute("data-rolename"));
 
         fetch('/admin/convert', {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
             method: 'POST',
             body: form
         })

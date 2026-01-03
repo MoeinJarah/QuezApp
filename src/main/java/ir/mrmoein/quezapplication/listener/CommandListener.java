@@ -1,5 +1,6 @@
 package ir.mrmoein.quezapplication.listener;
 
+import ir.mrmoein.quezapplication.model.dto.LoginRequest;
 import ir.mrmoein.quezapplication.model.entity.Authority;
 import ir.mrmoein.quezapplication.model.entity.Role;
 import ir.mrmoein.quezapplication.model.entity.RoleName;
@@ -25,15 +26,17 @@ public class CommandListener implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     @Autowired
-    public CommandListener(UserService service, RoleRepository roleRepository, UserRepository repository, TeacherRepository teacherRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public CommandListener(UserService service, RoleRepository roleRepository, UserRepository repository, TeacherRepository teacherRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, UserService userService) {
         this.service = service;
         this.roleRepository = roleRepository;
         this.repository = repository;
         this.teacherRepository = teacherRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
     }
 
 
@@ -90,6 +93,7 @@ public class CommandListener implements CommandLineRunner {
                     .build();
             userRepository.save(admins);
         }
+        userService.login(LoginRequest.builder().username("admin").password("admin").build());
     }
 }
 

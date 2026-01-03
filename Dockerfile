@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/quezApplication-0.0.1-SNAPSHOT.jar quezapp.jar
 
 # پورت اپلیکیشن
-EXPOSE 8080
+EXPOSE 8080 5005
 
 # دستور اجرای برنامه
-ENTRYPOINT ["java", "-jar", "quezapp.jar"]
+ENTRYPOINT ["java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar", "quezapp.jar"]

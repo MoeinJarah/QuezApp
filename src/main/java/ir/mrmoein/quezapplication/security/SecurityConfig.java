@@ -1,6 +1,9 @@
 package ir.mrmoein.quezapplication.security;
 
+import ir.mrmoein.quezapplication.security.jwt.JwtAuthFilter;
+import ir.mrmoein.quezapplication.security.jwt.JwtService;
 import ir.mrmoein.quezapplication.service.Impl.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,35 +16,28 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-//    private final AuthEntryPointJwt authenticationEntryPoint;
     private final CustomUserDetailsService details;
+    private final JwtService jwtTokenProvider;
 
-    public SecurityConfig(CustomUserDetailsService details) {
+    @Autowired
+    public SecurityConfig(CustomUserDetailsService details, JwtService jwtTokenProvider) {
         this.details = details;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
-
-//    public SecurityConfig(AuthEntryPointJwt authenticationEntryPoint, CustomUserDetailsService userDetailsService) {
-//        this.authenticationEntryPoint = authenticationEntryPoint;
-//        this.details = userDetailsService;
-//    }
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-//                .exceptionHandling(exception -> {
-//                    exception.authenticationEntryPoint(authenticationEntryPoint);
-//                })
-//                .sessionManagement(sessionManagement -> {
-//                    sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//                })
+                .sessionManagement(sessionManagement -> {
+                    sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS); // برای stateless بودن
+                })
                 .authorizeHttpRequests(authorizeRequests -> {
                     authorizeRequests
                             .requestMatchers("/", "/login" , "/error" , "/start/**", "/index", "/welcome/**").permitAll()
@@ -49,7 +45,8 @@ public class SecurityConfig {
                             .requestMatchers("/student/**").hasRole("STUDENT")
                             .requestMatchers("/teacher/**").hasRole("TEACHER")
                             .anyRequest().authenticated();
-                });
+                })
+                .addFilterBefore(new JwtAuthFilter(jwtTokenProvider , details), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

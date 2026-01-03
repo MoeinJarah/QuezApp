@@ -13,11 +13,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class LoginRequest {
 
-    @NotBlank
-    @Size(min = 5 , message = "username length must be more than 5 characters !!!")
+    @Size(min = 3 , message = "username length must be more than 3 characters !!!")
     private String username;
 
-    @NotBlank
     @Size(min = 4 , max = 10 , message = "password length must be among 4 and 10 !!!")
     private String password;
 

@@ -11,7 +11,12 @@ search.addEventListener("keyup", async function () {
     }
 
     try {
-        const response = await fetch(`/admin/search?query=${encodeURIComponent(query)}`, {method: "GET"});
+        const response = await fetch(`/admin/search?query=${encodeURIComponent(query)}`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            method: "GET"
+        });
         if (!response.ok) throw new Error("Failed request !!!");
 
         const data = await response.json();
@@ -47,7 +52,10 @@ function loadUser(data) {
 
                 fetch(`/admin/profile?nationalCode=${encodeURIComponent(dto.nationalCode)}`, {
                     method: "GET",
-                    headers: {"Content-Type": "application/json"}
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.getItem("token")
+                        ,"Content-Type": "application/json"
+                    }
                 })
                     .then(response => {
                         if (!response.ok) throw new Error("Failed to fetch profile");
@@ -117,6 +125,9 @@ function removeUser() {
     console.log(role_name)
 
     fetch(`/admin/remove?nationalCode=${encodeURIComponent(nationalCode)}&role=${encodeURIComponent(role_name)}`, {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
         method: "DELETE"
     }).then(response => {
         if (response.ok) {
@@ -136,6 +147,9 @@ function hideProfile() {
 async function invalidUser() {
     try {
         let response = await fetch("/admin/filter", {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
             method: "GET"
         })
 

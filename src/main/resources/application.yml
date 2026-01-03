@@ -12,21 +12,23 @@ spring:
       max-request-size: 2MB
       enabled: true
 
+
   datasource:
     url: jdbc:postgresql://db:5432/quizapp
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    username: postgres
+    password: moein1379
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+      dialect: org.hibernate.dialect.PostgreSQLDialect
 
   elasticsearch:
     uris: http://elastic:9200
 
   secret_key :
-    "secret_key"
+    "your-256-bit-secret-key-your-256-bit-secret-key"
 
   data:
     elasticsearch:

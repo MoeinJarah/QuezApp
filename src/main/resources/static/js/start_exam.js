@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     try {
         const response = await fetch(`/student/exam?exam=${encodeURIComponent(examId)}`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
             method: "POST"
         });
 
@@ -140,6 +143,7 @@ document.getElementById("examForm").addEventListener("submit", async function (e
         const response = await fetch("/student/answer", {
             method: "POST",
             headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token"),
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({

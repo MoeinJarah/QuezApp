@@ -18,7 +18,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 const errorData = await response.json();
                 handleValidationErrors(errorData);
             }
-            window.location.href = "/start";
+            setTimeout(() => {
+                window.location.href = "/start/login";
+            }, 2000); // 2 seconds delay for user to see the success message
         } catch (error) {
             location.reload()
             alert(error.message)
